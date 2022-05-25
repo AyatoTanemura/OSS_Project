@@ -90,8 +90,16 @@ summary(c.model)
 ##          ContribFilehttps://api.github.com/repos/mne-tools/mne-python/contents/.github/CONTRIBUTING.md,
 ##          
 
+# Unconditional growth model with predictors at o.1 significance level
 
+d.model <- lme(issues ~ members*Time_1 + watchers*Time_1 + pullReq*Time_1
+               + CmtCmnt*Time_1 + issueCmnt*Time_1 
+               + MemCommitters*Time_1 + PRClosedCnt*Time_1 + IssueClosedCnt*Time_1 
+               + Licence*Time_1
+               + ContribFile*Time_1
+               , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
 
+summary(d.model)
 
 
 
