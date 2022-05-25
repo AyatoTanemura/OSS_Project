@@ -73,11 +73,22 @@ b.model <- lme(issues ~ Time_1, data = df, random = ~ Time_1 | prjId, method = "
 summary(b.model)
 
 View(df)
+names(df)
 
+# Unconditional growth model with all predictors
 
+c.model <- lme(issues ~ forks*Time_1 + members*Time_1 + commits*Time_1 + watchers*Time_1 + pullReq*Time_1 
+               + CmtCmnt*Time_1 + pullReqCmnt*Time_1 + PR.Issue.Cmnt*Time_1 + issueCmnt*Time_1 
+               + committers*Time_1 + MemCommitters*Time_1 + PRClosedCnt*Time_1 + IssueClosedCnt*Time_1 
+               + PRClosedTime*Time_1 + IssueClosedTime*Time_1 + Health*Time_1 + Licence*Time_1
+               + ContribFile*Time_1 + OwnerFollower*Time_1 + AvgFollower*Time_1 + OwnerType*Time_1
+               , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
+summary(c.model)
 
-
-
+## p< 0.1 = members, watchers, pullReq, issueCmnt, MemCommitters, PRClosedCnt, IssueClosedCnt, LicenceApache License 2.0, 
+##          LicenceGNU General Public License v2.0, ContribFilehttps://api.github.com/repos/lift/framework/contents/CONTRIBUTING.md, 
+##          ContribFilehttps://api.github.com/repos/mne-tools/mne-python/contents/.github/CONTRIBUTING.md,
+##          
 
 
 
