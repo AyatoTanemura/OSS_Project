@@ -13,7 +13,9 @@ library(nlme)
 # Data Load----
 df <- read.csv("Data/prjDetPanel-Jan2011.csv", header = TRUE) %>% 
   mutate(prjId = factor(prjId)
-         , Time_1 = Time -1)
+         , Time_1 = Time -1
+         , Licence = factor(Licence)
+         , ContribFile = factor(ContribFile))
 
 names(df)
 
@@ -90,7 +92,7 @@ summary(c.model)
 ##          ContribFilehttps://api.github.com/repos/mne-tools/mne-python/contents/.github/CONTRIBUTING.md,
 ##          
 
-# Unconditional growth model with predictors at o.1 significance level
+# Unconditional growth model with predictors at 0.1 significance level
 
 d.model <- lme(issues ~ members*Time_1 + watchers*Time_1 + pullReq*Time_1
                + CmtCmnt*Time_1 + issueCmnt*Time_1 
@@ -101,6 +103,24 @@ d.model <- lme(issues ~ members*Time_1 + watchers*Time_1 + pullReq*Time_1
 
 summary(d.model)
 
+# Unconditional growth model with predictors at 0.05 significance level
 
+#e.model <- lme(issues ~ watchers*Time_1 + pullReq*Time_1
+#               + CmtCmnt*Time_1 + issueCmnt*Time_1 
+#               + MemCommitters*Time_1 + PRClosedCnt*Time_1 + IssueClosedCnt*Time_1 
+#               + "LicenceGNU Affero General Public License v3.0"*Time_1
+#               + "LicenceGNU General Public License v2.0"*Time_1
+#               + "ContribFilehttps://api.github.com/repos/Bukkit/Bukkit/contents/CONTRIBUTING.md"*Time_1
+#               + "ContribFilehttps://api.github.com/repos/dlang/phobos/contents/CONTRIBUTING.md"*Time_1
+#               + "ContribFilehttps://api.github.com/repos/enthought/enable/contents/CONTRIBUTING.rst"*Time_1
+#               + "ContribFilehttps://api.github.com/repos/lift/framework/contents/CONTRIBUTING.md"*Time_1
+#               + "ContribFilehttps://api.github.com/repos/request/request/contents/CONTRIBUTING.md"*Time_1
+#               + "ContribFilehttps://api.github.com/repos/xbmc/xbmc/contents/docs/CONTRIBUTING.md"*Time_1
+#               , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
 
+e.model <- lme(issues ~ watchers*Time_1 + pullReq*Time_1
+               + CmtCmnt*Time_1 + issueCmnt*Time_1 
+               + MemCommitters*Time_1 + PRClosedCnt*Time_1 + IssueClosedCnt*Time_1 
+               , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
 
+summary(e.model)
