@@ -126,5 +126,24 @@ e.model <- lme(issues ~ watchers*Time_1 + pullReq*Time_1
 summary(e.model)
 
 
-# How does the number of watchers change over time
-# Do the trajectories of the number of commits differ by numbers of watchers and owner types
+# Do the trajectories of the number of commits differ by numbers of watchers and owner types.
+
+names(df)
+
+f.model <-lme(issues ~ members*Time_1 + commits*Time_1 + watchers*Time_1 + pullReq*Time_1
+              , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
+
+summary(f.model)
+
+
+g.model <-lme(issues ~ members + commits*Time_1 + watchers*Time_1 + pullReq*Time_1
+              , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
+
+summary(g.model)
+
+#h.model <-lme(issues ~ members + commits*Time_1 + pullReq*Time_1
+#              , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
+#
+#summary(h.model)
+
+
