@@ -11,21 +11,22 @@ library(tidyverse)
 library(nlme)
 
 # Data Load----
+?read.csv
 df <- read.csv("Data/prjDetPanel-Jan2011.csv", header = TRUE) %>% 
   mutate(prjId = factor(prjId)
          , Time_1 = Time -1
-         , Licence = factor(Licence)
-         , ContribFile = factor(ContribFile))
+         #, Licence = factor(Licence)
+         #, ContribFile = factor(ContribFile)
+         ) %>% 
+  dplyr::select(Time, Time_1, everything()) 
 
-names(df)
-
-col.order <- c("X.",              "prjId",           "Period",          "Time",    "Time_1",        "StartDate",       "EndDate",        
-                "forks"       ,    "members"     ,    "commits"   ,      "issues"  ,        "watchers" ,       "pullReq",        
-                "CmtCmnt"  ,       "pullReqCmnt"   ,  "PR.Issue.Cmnt" ,  "issueCmnt" ,      "committers"   ,   "MemCommitters",  
-                "PRClosedCnt"  ,   "IssueClosedCnt"  ,"PRClosedTime"  ,  "IssueClosedTime" ,"Health" ,         "Licence",        
-                "ContribFile"  ,   "OwnerFollower" ,  "AvgFollower"   ,  "OwnerType" ) 
-
-df <- df[, col.order]
+#col.order <- c("X.",              "prjId",           "Period",          "Time",    "Time_1",        "StartDate",       "EndDate",        
+#                "forks"       ,    "members"     ,    "commits"   ,      "issues"  ,        "watchers" ,       "pullReq",        
+#                "CmtCmnt"  ,       "pullReqCmnt"   ,  "PR.Issue.Cmnt" ,  "issueCmnt" ,      "committers"   ,   "MemCommitters",  
+#                "PRClosedCnt"  ,   "IssueClosedCnt"  ,"PRClosedTime"  ,  "IssueClosedTime" ,"Health" ,         "Licence",        
+#                "ContribFile"  ,   "OwnerFollower" ,  "AvgFollower"   ,  "OwnerType" ) 
+#
+#df <- df[, col.order]
 
 
 # Data Check----
@@ -35,9 +36,8 @@ head(df)
 view(df)
 
 # First five project
-
-df5 <- df[1:40,]
-
+df5 <- df %>% filter(prjId %in% unique(df$prjId)[1:5])
+#df5 <- df[1:40,]
 View(df5)
 
 # Sampling
@@ -124,3 +124,7 @@ e.model <- lme(issues ~ watchers*Time_1 + pullReq*Time_1
                , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
 
 summary(e.model)
+
+
+# How does the number of watchers change over time
+# Do the trajectories of the number of commits differ by numbers of watchers and owner types
