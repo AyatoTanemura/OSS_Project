@@ -126,7 +126,7 @@ e.model <- lme(issues ~ watchers*Time_1 + pullReq*Time_1
 summary(e.model)
 
 
-# Do the trajectories of the number of commits differ by numbers of watchers and owner types.
+# Do the trajectories of the number of issues differ by the number of members, commits, watchers, and pull requests?
 
 names(df)
 
