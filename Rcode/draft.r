@@ -11,7 +11,6 @@ library(tidyverse)
 library(nlme)
 
 # Data Load----
-?read.csv
 df <- read.csv("Data/prjDetPanel-Jan2011.csv", header = TRUE) %>% 
   mutate(prjId = factor(prjId)
          , Time_1 = Time -1
@@ -19,15 +18,6 @@ df <- read.csv("Data/prjDetPanel-Jan2011.csv", header = TRUE) %>%
          #, ContribFile = factor(ContribFile)
          ) %>% 
   dplyr::select(Time, Time_1, everything()) 
-
-#col.order <- c("X.",              "prjId",           "Period",          "Time",    "Time_1",        "StartDate",       "EndDate",        
-#                "forks"       ,    "members"     ,    "commits"   ,      "issues"  ,        "watchers" ,       "pullReq",        
-#                "CmtCmnt"  ,       "pullReqCmnt"   ,  "PR.Issue.Cmnt" ,  "issueCmnt" ,      "committers"   ,   "MemCommitters",  
-#                "PRClosedCnt"  ,   "IssueClosedCnt"  ,"PRClosedTime"  ,  "IssueClosedTime" ,"Health" ,         "Licence",        
-#                "ContribFile"  ,   "OwnerFollower" ,  "AvgFollower"   ,  "OwnerType" ) 
-#
-#df <- df[, col.order]
-
 
 # Data Check----
 dim(df)
@@ -47,6 +37,7 @@ sample <- sample(df$prjId, size = 5)
 df.sam <- df %>% filter(prjId %in% sample)
 
 head(df.sam)
+names(df)
 dim(df.sam)
 view(df.sam)
 
@@ -58,6 +49,24 @@ xyplot(issues ~ Time_1 | prjId, data = df5,
          panel.xyplot(x, y)
          panel.lmline(x, y)
        }, as.table = T)
+
+
+interaction.plot(df5$Time_1, df5$prjId, df5$issues)
+
+
+plotmeans(df$issues~ df$Time_1, ylab="issues", main="The total number of issues over time", 
+          data=df, lwd = 10, barwidth=5,  n.label=FALSE)
+
+s <- geom_smooth(method = lm, se=FALSE)
+
+ggplot(df, aes(members, issues)) + geom_point() + s
+
+ggplot(df, aes(commits, issues)) + geom_point() + s
+
+ggplot(df, aes(watchers, issues)) + geom_point() + s
+
+ggplot(df, aes(pullReq, issues)) + geom_point() + s #log?
+
 
 # unconditional means model
 
@@ -77,73 +86,41 @@ summary(b.model)
 View(df)
 names(df)
 
-# Unconditional growth model with all predictors
-
-c.model <- lme(issues ~ forks*Time_1 + members*Time_1 + commits*Time_1 + watchers*Time_1 + pullReq*Time_1 
-               + CmtCmnt*Time_1 + pullReqCmnt*Time_1 + PR.Issue.Cmnt*Time_1 + issueCmnt*Time_1 
-               + committers*Time_1 + MemCommitters*Time_1 + PRClosedCnt*Time_1 + IssueClosedCnt*Time_1 
-               + PRClosedTime*Time_1 + IssueClosedTime*Time_1 + Health*Time_1 + Licence*Time_1
-               + ContribFile*Time_1 + OwnerFollower*Time_1 + AvgFollower*Time_1 + OwnerType*Time_1
-               , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
-summary(c.model)
-
-## p< 0.1 = members, watchers, pullReq, issueCmnt, MemCommitters, PRClosedCnt, IssueClosedCnt, LicenceApache License 2.0, 
-##          LicenceGNU General Public License v2.0, ContribFilehttps://api.github.com/repos/lift/framework/contents/CONTRIBUTING.md, 
-##          ContribFilehttps://api.github.com/repos/mne-tools/mne-python/contents/.github/CONTRIBUTING.md,
-##          
-
-# Unconditional growth model with predictors at 0.1 significance level
-
-d.model <- lme(issues ~ members*Time_1 + watchers*Time_1 + pullReq*Time_1
-               + CmtCmnt*Time_1 + issueCmnt*Time_1 
-               + MemCommitters*Time_1 + PRClosedCnt*Time_1 + IssueClosedCnt*Time_1 
-               + Licence*Time_1
-               + ContribFile*Time_1
-               , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
-
-summary(d.model)
-
-# Unconditional growth model with predictors at 0.05 significance level
-
-#e.model <- lme(issues ~ watchers*Time_1 + pullReq*Time_1
-#               + CmtCmnt*Time_1 + issueCmnt*Time_1 
-#               + MemCommitters*Time_1 + PRClosedCnt*Time_1 + IssueClosedCnt*Time_1 
-#               + "LicenceGNU Affero General Public License v3.0"*Time_1
-#               + "LicenceGNU General Public License v2.0"*Time_1
-#               + "ContribFilehttps://api.github.com/repos/Bukkit/Bukkit/contents/CONTRIBUTING.md"*Time_1
-#               + "ContribFilehttps://api.github.com/repos/dlang/phobos/contents/CONTRIBUTING.md"*Time_1
-#               + "ContribFilehttps://api.github.com/repos/enthought/enable/contents/CONTRIBUTING.rst"*Time_1
-#               + "ContribFilehttps://api.github.com/repos/lift/framework/contents/CONTRIBUTING.md"*Time_1
-#               + "ContribFilehttps://api.github.com/repos/request/request/contents/CONTRIBUTING.md"*Time_1
-#               + "ContribFilehttps://api.github.com/repos/xbmc/xbmc/contents/docs/CONTRIBUTING.md"*Time_1
-#               , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
-
-e.model <- lme(issues ~ watchers*Time_1 + pullReq*Time_1
-               + CmtCmnt*Time_1 + issueCmnt*Time_1 
-               + MemCommitters*Time_1 + PRClosedCnt*Time_1 + IssueClosedCnt*Time_1 
-               , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
-
-summary(e.model)
-
 
 # Do the trajectories of the number of issues differ by the number of members, commits, watchers, and pull requests?
 
 names(df)
 
-f.model <-lme(issues ~ members*Time_1 + commits*Time_1 + watchers*Time_1 + pullReq*Time_1
+c.model <-lme(issues ~ members*Time_1 + commits*Time_1 + watchers*Time_1 + pullReq*Time_1
+              , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
+
+summary(c.model)
+
+
+
+# Remove member's ROC
+d.model <-lme(issues ~ members + commits*Time_1 + watchers*Time_1 + pullReq*Time_1
+              , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
+
+summary(d.model)
+
+# log the model
+
+e.model <-lme(issues ~ members + commits*Time_1 + watchers*Time_1 + log(pullReq+1)*Time_1
+              , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
+
+summary(e.model)
+
+# remove roc from log(pullReq)
+
+f.model <-lme(issues ~ members + commits*Time_1 + watchers*Time_1 + log(pullReq+1)
               , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
 
 summary(f.model)
 
-
-g.model <-lme(issues ~ members + commits*Time_1 + watchers*Time_1 + pullReq*Time_1
-              , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
-
-summary(g.model)
-
-#h.model <-lme(issues ~ members + commits*Time_1 + pullReq*Time_1
+## remove watchers predictors
+#
+#g.model <-lme(issues ~ members + commits*Time_1  + log(pullReq+1)
 #              , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
 #
-#summary(h.model)
-
-
+#summary(g.model)
