@@ -118,9 +118,18 @@ f.model <-lme(issues ~ members + commits*Time_1 + watchers*Time_1 + log(pullReq+
 
 summary(f.model)
 
-## remove watchers predictors
+# remove watchers predictors
+
+g.model <-lme(issues ~ members + commits*Time_1  + log(pullReq+1)
+              , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
+
+summary(g.model)
+
+
+## remove time variable
 #
-#g.model <-lme(issues ~ members + commits*Time_1  + log(pullReq+1)
+#
+#f.model <-lme(issues ~ members + commits + watchers + log(pullReq+1)
 #              , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
 #
-#summary(g.model)
+#summary(f.model)
