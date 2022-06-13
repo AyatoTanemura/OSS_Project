@@ -52,12 +52,12 @@ xyplot(issues ~ Time_1 | prjId, data = df5,
 
 
 interaction.plot(df5$Time_1, df5$prjId, df5$issues)
-
+?interaction.plot
 
 plotmeans(df$issues~ df$Time_1, ylab="issues", main="The total number of issues over time", 
           data=df, lwd = 10, barwidth=5,  n.label=FALSE)
 
-s <- geom_smooth(method = lm, se=FALSE)
+s <- geom_smooth(se=FALSE)
 
 ggplot(df, aes(members, issues)) + geom_point() + s
 
@@ -67,6 +67,7 @@ ggplot(df, aes(watchers, issues)) + geom_point() + s
 
 ggplot(df, aes(pullReq, issues)) + geom_point() + s #log?
 
+?geom_smooth
 
 # unconditional means model
 
@@ -111,12 +112,20 @@ e.model <-lme(issues ~ members + commits*Time_1 + watchers*Time_1 + log(pullReq+
 
 summary(e.model)
 
+e.varcorr <- VarCorr(e.model)
+
+e.ICC<-as.numeric(e.varcorr[1,1])/(as.numeric(e.varcorr[2,1])+as.numeric(e.varcorr[1,1]))
+
 # remove roc from log(pullReq)
 
 f.model <-lme(issues ~ members + commits*Time_1 + watchers*Time_1 + log(pullReq+1)
               , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
 
 summary(f.model)
+
+f.varcorr <- VarCorr(f.model)
+
+f.ICC<-as.numeric(f.varcorr[1,1])/(as.numeric(f.varcorr[2,1])+as.numeric(f.varcorr[1,1]))
 
 # remove watchers predictors
 
@@ -133,3 +142,17 @@ summary(g.model)
 #              , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
 #
 #summary(f.model)
+
+# remove roc from log(pullReq)
+
+h.model <-lme(issues ~ members + log(commits+1)*Time_1 + watchers*Time_1 + log(pullReq+1)
+              , data = df, random = ~ Time_1 | prjId, method = "ML", na.action=na.exclude)
+
+summary(h.model)
+
+
+
+
+
+
+
